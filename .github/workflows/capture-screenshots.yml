@@ -9,7 +9,6 @@ permissions:
 
 jobs:
   capture:
-    if: ${{ !contains(github.event.head_commit.message, 'docs: add Streamlit screenshots') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -28,9 +27,7 @@ jobs:
 
       - name: Start Streamlit app
         run: |
-          PYTHONPATH=src nohup python -m streamlit run app/streamlit_app.py \
-            --server.headless true --server.port 8501 --server.address 127.0.0.1 \
-            > /tmp/streamlit.log 2>&1 &
+          PYTHONPATH=src nohup python -m streamlit run app/streamlit_app.py --server.headless true --server.port 8501 --server.address 127.0.0.1 > /tmp/streamlit.log 2>&1 &
           for i in {1..60}; do
             if curl -fsS http://127.0.0.1:8501/_stcore/health > /dev/null; then
               echo "Streamlit is ready"
@@ -49,34 +46,26 @@ jobs:
           from pathlib import Path
           from playwright.sync_api import sync_playwright
 
-          OUT = Path("docs/screenshots")
-          URL = "http://127.0.0.1:8501"
-
+          out = Path("docs/screenshots")
           with sync_playwright() as p:
               browser = p.chromium.launch(args=["--no-sandbox"])
-              page = browser.new_page(
-                  viewport={"width": 1440, "height": 1000},
-                  device_scale_factor=1,
-              )
-              page.goto(URL, wait_until="domcontentloaded", timeout=60_000)
-              page.get_by_role("heading", name="Multi-Asset Backtesting Engine").wait_for(
-                  timeout=60_000
-              )
+              page = browser.new_page(viewport={"width": 1440, "height": 1000})
+              page.goto("http://127.0.0.1:8501", wait_until="domcontentloaded", timeout=60_000)
+              page.get_by_role("heading", name="Multi-Asset Backtesting Engine").wait_for(timeout=60_000)
               page.wait_for_timeout(5_000)
-              page.screenshot(path=OUT / "01-dashboard.png", full_page=False)
+              page.screenshot(path=out / "01-dashboard.png", full_page=False)
 
-              selectboxes = page.locator('[data-testid="stSelectbox"]')
-              selectboxes.nth(1).locator("button").click()
+              boxes = page.locator('[data-testid="stSelectbox"]')
+              boxes.nth(1).locator("button").click()
               page.get_by_text("Mean Reversion", exact=True).last.click()
               page.wait_for_timeout(5_000)
-              page.screenshot(path=OUT / "02-mean-reversion.png", full_page=False)
+              page.screenshot(path=out / "02-mean-reversion.png", full_page=False)
 
-              selectboxes = page.locator('[data-testid="stSelectbox"]')
-              selectboxes.nth(0).locator("button").click()
+              boxes = page.locator('[data-testid="stSelectbox"]')
+              boxes.nth(0).locator("button").click()
               page.get_by_text("S&P 500 E-mini", exact=True).last.click()
               page.wait_for_timeout(5_000)
-              page.screenshot(path=OUT / "03-es-futures.png", full_page=False)
-
+              page.screenshot(path=out / "03-es-futures.png", full_page=False)
               browser.close()
           PY
           python /tmp/capture.py
@@ -95,11 +84,11 @@ jobs:
               path.write_text(text)
           PY
 
-      - name: Commit screenshots and README
+      - name: Commit screenshots and remove capture workflow
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/screenshots README.md .github/workflows/capture-screenshots.yml
+          git add docs/screenshots README.md
           git rm .github/workflows/capture-screenshots.yml
           git commit -m "docs: add Streamlit screenshots"
           git push
