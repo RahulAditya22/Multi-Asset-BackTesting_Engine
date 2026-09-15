@@ -112,7 +112,9 @@ class Backtester:
         if quantity != 0:
             index = frame.index[-1]
             price = float(frame["Close"].iloc[-1])
-            execution_price = price * (1 - self.slippage if quantity > 0 else 1 + self.slippage)
+            execution_price = price * (
+                1 - self.slippage if quantity > 0 else 1 + self.slippage
+            )
             fee = abs(quantity * execution_price) * self.transaction_cost
             cash += quantity * execution_price - fee
             trades.append(
