@@ -1,7 +1,7 @@
 """Multi-Asset Backtesting Engine."""
 
 from .data_loader import DataLoader
-from .engine import BacktestResult, Backtester, Trade
+from .engine import Backtester, BacktestResult, Trade
 from .performance import PerformanceAnalyzer
 
 __all__ = [
