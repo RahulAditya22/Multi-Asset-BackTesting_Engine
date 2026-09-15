@@ -52,12 +52,7 @@ class Backtester:
         if data.empty or "Close" not in data:
             raise ValueError("Backtest data must be non-empty and contain Close")
         frame = data.sort_index().copy()
-        signals = (
-            strategy.generate_signals(frame)
-            .reindex(frame.index)
-            .fillna(0)
-            .astype(int)
-        )
+        signals = strategy.generate_signals(frame).reindex(frame.index).fillna(0).astype(int)
         if not signals.isin([-1, 0, 1]).all():
             raise ValueError("Strategy signals must be -1, 0, or 1")
 
@@ -95,9 +90,7 @@ class Backtester:
                     execution_price = price * (
                         1 + self.slippage if target > 0 else 1 - self.slippage
                     )
-                    quantity = target * (
-                        cash / (execution_price * (1 + self.transaction_cost))
-                    )
+                    quantity = target * (cash / (execution_price * (1 + self.transaction_cost)))
                     fee = abs(quantity * execution_price) * self.transaction_cost
                     cash -= quantity * execution_price + fee
                     trades.append(
@@ -117,9 +110,7 @@ class Backtester:
         if quantity != 0:
             index = frame.index[-1]
             price = float(frame["Close"].iloc[-1])
-            execution_price = price * (
-                1 - self.slippage if quantity > 0 else 1 + self.slippage
-            )
+            execution_price = price * (1 - self.slippage if quantity > 0 else 1 + self.slippage)
             fee = abs(quantity * execution_price) * self.transaction_cost
             cash += quantity * execution_price - fee
             trades.append(
