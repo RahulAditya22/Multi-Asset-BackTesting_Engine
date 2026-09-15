@@ -22,4 +22,8 @@ class MovingAverageCrossover(Strategy):
             raise ValueError("Strategy data must contain a Close column")
         short_ma = data["Close"].rolling(self.short_window).mean()
         long_ma = data["Close"].rolling(self.long_window).mean()
-        return pd.Series((short_ma > long_ma).astype(int), index=data.index, name="signal")
+
+        signals = pd.Series(pd.NA, index=data.index, dtype="Int64", name="signal")
+        signals[short_ma > long_ma] = 1
+        signals[short_ma < long_ma] = 0
+        return signals.ffill().fillna(0).astype(int)
