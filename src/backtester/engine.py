@@ -70,18 +70,38 @@ class Backtester:
 
             if target != current_direction:
                 if quantity != 0:
-                    execution_price = price * (1 - self.slippage if quantity > 0 else 1 + self.slippage)
+                    execution_price = price * (
+                        1 - self.slippage if quantity > 0 else 1 + self.slippage
+                    )
                     fee = abs(quantity * execution_price) * self.transaction_cost
                     cash += quantity * execution_price - fee
-                    trades.append(Trade(index, execution_price, -quantity, "SELL" if quantity > 0 else "COVER", fee))
+                    trades.append(
+                        Trade(
+                            index,
+                            execution_price,
+                            -quantity,
+                            "SELL" if quantity > 0 else "COVER",
+                            fee,
+                        )
+                    )
                     quantity = 0.0
 
                 if target != 0:
-                    execution_price = price * (1 + self.slippage if target > 0 else 1 - self.slippage)
+                    execution_price = price * (
+                        1 + self.slippage if target > 0 else 1 - self.slippage
+                    )
                     quantity = target * (cash / execution_price)
                     fee = abs(quantity * execution_price) * self.transaction_cost
                     cash -= quantity * execution_price + fee
-                    trades.append(Trade(index, execution_price, quantity, "BUY" if target > 0 else "SHORT", fee))
+                    trades.append(
+                        Trade(
+                            index,
+                            execution_price,
+                            quantity,
+                            "BUY" if target > 0 else "SHORT",
+                            fee,
+                        )
+                    )
 
             equity.append(cash + quantity * price)
             positions.append(quantity)
@@ -93,7 +113,15 @@ class Backtester:
             execution_price = price * (1 - self.slippage if quantity > 0 else 1 + self.slippage)
             fee = abs(quantity * execution_price) * self.transaction_cost
             cash += quantity * execution_price - fee
-            trades.append(Trade(index, execution_price, -quantity, "SELL" if quantity > 0 else "COVER", fee))
+            trades.append(
+                Trade(
+                    index,
+                    execution_price,
+                    -quantity,
+                    "SELL" if quantity > 0 else "COVER",
+                    fee,
+                )
+            )
             quantity = 0.0
             equity[-1] = cash
             positions[-1] = 0.0

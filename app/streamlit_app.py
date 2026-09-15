@@ -2,13 +2,8 @@
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import pandas as pd
 import streamlit as st
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from backtester.data_loader import DEFAULT_SYMBOLS, DataLoader
 from backtester.engine import Backtester
@@ -18,13 +13,17 @@ from backtester.strategies import MeanReversion, MovingAverageCrossover
 
 st.set_page_config(page_title="Multi-Asset Backtesting Engine", page_icon="📈", layout="wide")
 st.title("Multi-Asset Backtesting Engine")
-st.caption("A transparent, no-lookahead framework for testing systematic trading ideas on historical data.")
+st.caption(
+    "A transparent, no-lookahead framework for testing systematic trading ideas on historical data."
+)
 
 with st.sidebar:
     st.header("Backtest Controls")
     asset_name = st.selectbox("Asset", list(DEFAULT_SYMBOLS))
     strategy_name = st.selectbox("Strategy", ["MA Crossover", "Mean Reversion"])
-    initial_capital = st.number_input("Initial capital", min_value=1_000.0, value=100_000.0, step=5_000.0)
+    initial_capital = st.number_input(
+        "Initial capital", min_value=1_000.0, value=100_000.0, step=5_000.0
+    )
     transaction_cost = st.slider("Transaction cost (%)", 0.0, 1.0, 0.05, 0.01) / 100
     slippage = st.slider("Slippage (%)", 0.0, 1.0, 0.05, 0.01) / 100
 
@@ -40,10 +39,12 @@ with st.sidebar:
         entry_z = st.slider("Entry Z-score", 0.5, 3.5, 2.0, 0.1)
         strategy = MeanReversion(mean_window, entry_z)
 
+
 @st.cache_data(ttl=900, show_spinner=False)
 def load_data(symbol: str) -> pd.DataFrame:
     """Load cached market data for the selected symbol."""
     return DataLoader().load(symbol)
+
 
 try:
     data = load_data(DEFAULT_SYMBOLS[asset_name])

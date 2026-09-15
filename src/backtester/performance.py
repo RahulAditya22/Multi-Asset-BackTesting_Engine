@@ -15,7 +15,9 @@ class PerformanceAnalyzer:
             raise ValueError("risk_free_rate cannot be negative")
         self.risk_free_rate = risk_free_rate
 
-    def analyze(self, equity_curve: pd.Series, trades: list | None = None) -> dict[str, float | int]:
+    def analyze(
+        self, equity_curve: pd.Series, trades: list | None = None
+    ) -> dict[str, float | int]:
         """Calculate total return, CAGR, Sharpe, drawdown, and trade statistics."""
         if equity_curve.empty or (equity_curve <= 0).any():
             raise ValueError("Equity curve must be non-empty and positive")
@@ -26,7 +28,11 @@ class PerformanceAnalyzer:
         returns = curve.pct_change().dropna()
         daily_rf = (1 + self.risk_free_rate) ** (1 / 252) - 1
         excess = returns - daily_rf
-        sharpe = math.sqrt(252) * excess.mean() / excess.std(ddof=1) if len(excess) > 1 and excess.std(ddof=1) else 0.0
+        sharpe = (
+            math.sqrt(252) * excess.mean() / excess.std(ddof=1)
+            if len(excess) > 1 and excess.std(ddof=1)
+            else 0.0
+        )
         running_max = curve.cummax()
         drawdown = curve / running_max - 1
         max_drawdown = float(drawdown.min())
@@ -36,11 +42,16 @@ class PerformanceAnalyzer:
         losses = [pnl for pnl in closed_trades if pnl < 0]
         win_rate = len(wins) / len(closed_trades) if closed_trades else 0.0
         return {
-            "total_return": float(total_return), "cagr": float(cagr), "sharpe_ratio": float(sharpe),
-            "max_drawdown": max_drawdown, "max_drawdown_duration_days": int(duration),
-            "win_rate": float(win_rate), "average_win": float(sum(wins) / len(wins)) if wins else 0.0,
+            "total_return": float(total_return),
+            "cagr": float(cagr),
+            "sharpe_ratio": float(sharpe),
+            "max_drawdown": max_drawdown,
+            "max_drawdown_duration_days": int(duration),
+            "win_rate": float(win_rate),
+            "average_win": float(sum(wins) / len(wins)) if wins else 0.0,
             "average_loss": float(sum(losses) / len(losses)) if losses else 0.0,
-            "trade_count": len(closed_trades), "ending_value": float(curve.iloc[-1]),
+            "trade_count": len(closed_trades),
+            "ending_value": float(curve.iloc[-1]),
         }
 
     @staticmethod

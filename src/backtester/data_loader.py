@@ -7,7 +7,11 @@ from pathlib import Path
 from typing import Final
 
 import pandas as pd
-import yfinance as yf
+
+try:
+    import yfinance as yf
+except ModuleNotFoundError:
+    yf = None  # type: ignore[assignment]
 
 LOGGER = logging.getLogger(__name__)
 REQUIRED_COLUMNS: Final = ["Open", "High", "Low", "Close", "Volume"]
@@ -19,11 +23,7 @@ DEFAULT_SYMBOLS: Final[dict[str, str]] = {
 
 
 class DataLoader:
-    """Load OHLCV market data from Yahoo Finance or local CSV files.
-
-    Args:
-        fallback_dir: Directory containing fallback CSV files.
-    """
+    """Load OHLCV market data from Yahoo Finance or local CSV files."""
 
     def __init__(self, fallback_dir: str | Path = "data/sample_csv") -> None:
         self.fallback_dir = Path(fallback_dir)
@@ -36,6 +36,8 @@ class DataLoader:
     ) -> pd.DataFrame:
         """Return normalized OHLCV data for a symbol."""
         try:
+            if yf is None:
+                raise RuntimeError("yfinance is not installed")
             data = yf.download(
                 symbol, start=start, end=end, auto_adjust=False, progress=False, threads=False
             )
