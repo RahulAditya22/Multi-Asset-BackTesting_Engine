@@ -18,7 +18,17 @@ def test_parse_params_rejects_invalid_value() -> None:
         parse_params("short_window")
 
 
-def test_cli_run_with_new_asset(capsys: pytest.CaptureFixture[str]) -> None:
+def test_cli_run_with_new_asset(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class FakeYahoo:
+        @staticmethod
+        def download(*args, **kwargs):
+            raise RuntimeError("rate limited")
+
+    import backtester.data_loader as data_loader_module
+
+    monkeypatch.setattr(data_loader_module, "yf", FakeYahoo)
     assert (
         main(
             [
@@ -40,7 +50,17 @@ def test_cli_run_with_new_asset(capsys: pytest.CaptureFixture[str]) -> None:
     assert "ending_value" in output["metrics"]
 
 
-def test_cli_run_mean_reversion(capsys: pytest.CaptureFixture[str]) -> None:
+def test_cli_run_mean_reversion(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class FakeYahoo:
+        @staticmethod
+        def download(*args, **kwargs):
+            raise RuntimeError("rate limited")
+
+    import backtester.data_loader as data_loader_module
+
+    monkeypatch.setattr(data_loader_module, "yf", FakeYahoo)
     assert (
         main(
             [
