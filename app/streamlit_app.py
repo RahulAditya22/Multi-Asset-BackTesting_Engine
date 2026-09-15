@@ -5,11 +5,11 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from src.backtester.data_loader import DEFAULT_SYMBOLS, DataLoader
-from src.backtester.engine import Backtester
-from src.backtester.performance import PerformanceAnalyzer
-from src.backtester.plotting import drawdown_chart, equity_curve_chart, price_signal_chart
-from src.backtester.strategies import MeanReversion, MovingAverageCrossover
+from backtester.data_loader import DEFAULT_SYMBOLS, DataLoader
+from backtester.engine import Backtester
+from backtester.performance import PerformanceAnalyzer
+from backtester.plotting import drawdown_chart, equity_curve_chart, price_signal_chart
+from backtester.strategies import MeanReversion, MovingAverageCrossover
 
 st.set_page_config(page_title="Multi-Asset Backtesting Engine", page_icon="📈", layout="wide")
 st.title("Multi-Asset Backtesting Engine")
