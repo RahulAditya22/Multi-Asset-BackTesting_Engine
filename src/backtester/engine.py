@@ -52,7 +52,9 @@ class Backtester:
         if data.empty or "Close" not in data:
             raise ValueError("Backtest data must be non-empty and contain Close")
         frame = data.sort_index().copy()
-        signals = strategy.generate_signals(frame).reindex(frame.index).fillna(0).astype(int)
+        signals = (
+            strategy.generate_signals(frame).reindex(frame.index).fillna(0).astype(int)
+        )
         if not signals.isin([-1, 0, 1]).all():
             raise ValueError("Strategy signals must be -1, 0, or 1")
 
