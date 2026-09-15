@@ -3,8 +3,6 @@ name: Capture app screenshots
 on:
   push:
     branches: [main]
-    paths:
-      - ".github/workflows/capture-screenshots.yml"
   workflow_dispatch:
 
 permissions:
@@ -12,6 +10,7 @@ permissions:
 
 jobs:
   capture:
+    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message != 'docs: add Streamlit application screenshots'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
