@@ -20,43 +20,53 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Start the Streamlit app
+        run: |
+          PYTHONPATH=src streamlit run app/streamlit_app.py --server.headless true --server.port 8501 > /tmp/streamlit.log 2>&1 &
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:8501/_stcore/health > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/streamlit.log
+          exit 1
+
       - name: Install Playwright
         run: |
-          python -m pip install --upgrade pip
           python -m pip install playwright
           python -m playwright install --with-deps chromium
 
-      - name: Capture the live Streamlit app
-        env:
-          APP_URL: https://multi-asset-backtesting-engine.onrender.com
+      - name: Capture the running Streamlit app
         run: |
           mkdir -p docs/screenshots
           cat > /tmp/capture.py <<'PY'
-          import os
           from pathlib import Path
           from playwright.sync_api import sync_playwright
 
-          url = os.environ["APP_URL"]
           out = Path("docs/screenshots")
 
           with sync_playwright() as p:
               browser = p.chromium.launch(args=["--no-sandbox"])
               page = browser.new_page(viewport={"width": 1440, "height": 1000}, device_scale_factor=1)
-              page.goto(url, wait_until="domcontentloaded", timeout=120_000)
-              page.get_by_text("Multi-Asset Backtesting Engine", exact=True).first.wait_for(timeout=120_000)
-              page.wait_for_timeout(8_000)
+              page.goto("http://127.0.0.1:8501", wait_until="domcontentloaded", timeout=60_000)
+              page.get_by_text("Multi-Asset Backtesting Engine", exact=True).first.wait_for(timeout=60_000)
+              page.wait_for_timeout(5_000)
               page.screenshot(path=out / "01-dashboard.png", full_page=False)
 
               selects = page.locator('[data-testid="stSelectbox"]')
               selects.nth(1).locator('button').click()
               page.get_by_text("Mean Reversion", exact=True).last.click()
-              page.wait_for_timeout(5_000)
+              page.wait_for_timeout(4_000)
               page.screenshot(path=out / "02-mean-reversion.png", full_page=False)
 
               selects = page.locator('[data-testid="stSelectbox"]')
               selects.nth(0).locator('button').click()
               page.get_by_text("S&P 500 E-mini", exact=True).last.click()
-              page.wait_for_timeout(5_000)
+              page.wait_for_timeout(4_000)
               page.screenshot(path=out / "03-es-futures.png", full_page=False)
               browser.close()
           PY
@@ -71,7 +81,7 @@ jobs:
           readme = Path("README.md")
           text = readme.read_text()
           marker = "## Application screenshots"
-          section = '''## Application screenshots\n\nThe following screenshots are captured from the deployed Streamlit application and show the live dashboard, mean-reversion workflow, and S&P 500 E-mini futures configuration.\n\n### Dashboard\n\n![Live Streamlit dashboard](docs/screenshots/01-dashboard.png)\n\n### Mean reversion\n\n![Mean-reversion backtest](docs/screenshots/02-mean-reversion.png)\n\n### S&P 500 E-mini futures\n\n![S&P 500 E-mini futures backtest](docs/screenshots/03-es-futures.png)\n\n'''
+          section = '''## Application screenshots\n\nThe following screenshots are captured from the running Streamlit application and show the live dashboard, mean-reversion workflow, and S&P 500 E-mini futures configuration.\n\n### Dashboard\n\n![Live Streamlit dashboard](docs/screenshots/01-dashboard.png)\n\n### Mean reversion\n\n![Mean-reversion backtest](docs/screenshots/02-mean-reversion.png)\n\n### S&P 500 E-mini futures\n\n![S&P 500 E-mini futures backtest](docs/screenshots/03-es-futures.png)\n\n'''
           if marker not in text:
               anchor = "## How it works"
               text = text.replace(anchor, section + anchor, 1)
