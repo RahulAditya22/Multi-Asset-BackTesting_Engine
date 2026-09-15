@@ -90,7 +90,9 @@ class Backtester:
                     execution_price = price * (
                         1 + self.slippage if target > 0 else 1 - self.slippage
                     )
-                    quantity = target * (cash / execution_price)
+                    quantity = target * (
+                        cash / (execution_price * (1 + self.transaction_cost))
+                    )
                     fee = abs(quantity * execution_price) * self.transaction_cost
                     cash -= quantity * execution_price + fee
                     trades.append(
