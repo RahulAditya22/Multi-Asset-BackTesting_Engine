@@ -17,6 +17,16 @@ A Python backtesting framework that turns historical market prices into an audit
 5. **Track the portfolio** — cash, position size, equity, and every execution are recorded.
 6. **Analyze performance** — return, CAGR, annualized Sharpe, maximum drawdown and duration, win rate, and average win/loss are calculated.
 
+## Supported assets
+
+| Asset | Yahoo Finance ticker |
+| --- | --- |
+| Crude Oil | `CL=F` |
+| Gold | `GC=F` |
+| EUR/USD | `EURUSD=X` |
+| 10-Year T-Note futures | `ZN=F` |
+| S&P 500 E-mini futures | `ES=F` |
+
 ## Strategies
 
 ### Moving Average Crossover
@@ -42,10 +52,22 @@ black --check .
 streamlit run app/streamlit_app.py
 ```
 
+## Command-line usage
+
+The engine can also be run without Streamlit. From the repository root, set `PYTHONPATH=src` and invoke the package directly:
+
+```bash
+PYTHONPATH=src python -m backtester run --asset "S&P 500 E-mini" --strategy ma-crossover --params short_window=10,long_window=30
+```
+
+Available strategies are `ma-crossover` and `mean-reversion`. Strategy parameters are supplied as comma-separated `name=value` pairs. The CLI prints the selected asset, ticker, row count, strategy, and performance metrics as JSON.
+
 ## Project structure
 
 ```text
 src/backtester/
+├── __main__.py
+├── cli.py
 ├── data_loader.py
 ├── engine.py
 ├── performance.py
@@ -53,7 +75,8 @@ src/backtester/
 └── strategies/
     ├── base.py
     ├── moving_average_crossover.py
-    └── mean_reversion.py
+    ├── mean_reversion.py
+    └── walk_forward.py
 app/streamlit_app.py
 tests/
 data/sample_csv/
@@ -73,14 +96,14 @@ pyproject.toml
 ## What I'd improve next
 
 - Add futures contract rolls and contract-specific multipliers/margin models.
-- Add walk-forward testing and parameter-sensitivity analysis.
+- Add parameter-sensitivity analysis around walk-forward testing.
 - Add portfolio-level allocation across multiple assets and volatility targeting.
 - Add more realistic execution models and benchmark comparisons.
 - Add downloadable backtest reports and persistent experiment tracking.
 
 ## Testing
 
-The test suite covers CSV parsing, API failure fallback, strategy signals on hand-crafted price paths, next-bar execution, forced liquidation, return calculations, Sharpe calculation, and drawdown behavior. CI enforces Ruff, Black, pytest, and an 80% source-coverage floor.
+The test suite covers CSV parsing, API failure fallback, strategy signals on hand-crafted price paths, next-bar execution, forced liquidation, return calculations, Sharpe calculation, drawdown behavior, and CLI parsing/execution. CI enforces Ruff, Black, pytest, and an 80% source-coverage floor.
 
 ## Disclaimer
 
