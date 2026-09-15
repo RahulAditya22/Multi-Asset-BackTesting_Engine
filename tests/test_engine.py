@@ -14,8 +14,7 @@ class FixedStrategy(Strategy):
 
 def test_engine_executes_on_next_bar_and_liquidates() -> None:
     data = pd.DataFrame(
-        {"Close": [100.0, 110.0, 120.0]},
-        index=pd.date_range("2025-01-01", periods=3),
+        {"Close": [100.0, 110.0, 120.0]}, index=pd.date_range("2025-01-01", periods=3)
     )
     result = Backtester(
         initial_capital=1_000, transaction_cost=0, slippage=0
