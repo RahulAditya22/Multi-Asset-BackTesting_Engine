@@ -8,6 +8,22 @@ A Python backtesting framework that turns historical market prices into an audit
 
 **[Open the interactive backtester](https://multi-asset-backtesting-engine.onrender.com)**
 
+## Screenshots
+
+The following screenshots are captured from the running Streamlit application and show the interactive dashboard across supported strategies and assets.
+
+![Dashboard — Gold with Moving Average Crossover](docs/screenshots/01-dashboard.png)
+
+*Dashboard with the Gold asset and Moving Average Crossover strategy.*
+
+![Mean Reversion strategy](docs/screenshots/02-mean-reversion.png)
+
+*Mean Reversion strategy selected in the same interactive dashboard.*
+
+![S&P 500 E-mini futures](docs/screenshots/03-es-futures.png)
+
+*S&P 500 E-mini futures selected to demonstrate the multi-asset workflow.*
+
 ## How it works
 
 1. **Load data** — `DataLoader` retrieves daily OHLCV data through `yfinance` and falls back to committed CSV samples when the network source is unavailable.
