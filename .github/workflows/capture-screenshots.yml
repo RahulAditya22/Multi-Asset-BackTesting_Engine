@@ -55,14 +55,12 @@ jobs:
               page.wait_for_timeout(5_000)
               page.screenshot(path=out / "01-dashboard.png", full_page=False)
 
-              boxes = page.locator('[data-testid="stSelectbox"]')
-              boxes.nth(1).locator("button").click()
+              page.get_by_text("MA Crossover", exact=True).click()
               page.get_by_text("Mean Reversion", exact=True).last.click()
               page.wait_for_timeout(5_000)
               page.screenshot(path=out / "02-mean-reversion.png", full_page=False)
 
-              boxes = page.locator('[data-testid="stSelectbox"]')
-              boxes.nth(0).locator("button").click()
+              page.get_by_text("Gold", exact=True).click()
               page.get_by_text("S&P 500 E-mini", exact=True).last.click()
               page.wait_for_timeout(5_000)
               page.screenshot(path=out / "03-es-futures.png", full_page=False)
