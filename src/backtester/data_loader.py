@@ -19,6 +19,8 @@ DEFAULT_SYMBOLS: Final[dict[str, str]] = {
     "Crude Oil": "CL=F",
     "Gold": "GC=F",
     "EUR/USD": "EURUSD=X",
+    "10-Year T-Note": "ZN=F",
+    "S&P 500 E-mini": "ES=F",
 }
 
 

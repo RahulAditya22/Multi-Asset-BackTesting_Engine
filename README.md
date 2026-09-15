@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/RahulAditya22/Multi-Asset-BackTesting_Engine/actions/workflows/ci.yml/badge.svg)](https://github.com/RahulAditya22/Multi-Asset-BackTesting_Engine/actions/workflows/ci.yml) [![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7)](https://multi-asset-backtesting-engine.onrender.com)
 
-A Python backtesting framework that turns historical market prices into an auditable simulation of a trading strategy. You can select assets such as crude oil, gold, and EUR/USD, test moving-average crossover or mean-reversion rules, include transaction costs and slippage, and inspect return, CAGR, Sharpe ratio, drawdown, win rate, trades, and interactive charts. It is designed as an educational portfolio project: the goal is to make the mechanics of systematic trading understandable while keeping the implementation explicit and free of lookahead bias.
+A Python backtesting framework that turns historical market prices into an auditable simulation of a trading strategy. You can select assets including crude oil, gold, EUR/USD, 10-Year T-Note futures, and S&P 500 E-mini futures, test moving-average crossover or mean-reversion rules, include transaction costs and slippage, and inspect return, CAGR, Sharpe ratio, drawdown, win rate, trades, and interactive charts. It is designed as an educational portfolio project: the goal is to make the mechanics of systematic trading understandable while keeping the implementation explicit and free of lookahead bias.
 
 ## Live demo
 

@@ -43,6 +43,35 @@ def test_api_failure_falls_back_to_csv(tmp_path: Path, monkeypatch: pytest.Monke
     assert len(loader.load("TEST")) == 3
 
 
+@pytest.mark.parametrize("symbol", ["ZN=F", "ES=F"])
+def test_new_asset_csv_fallback_loads(symbol: str) -> None:
+    fallback_dir = Path(__file__).resolve().parents[1] / "data" / "sample_csv"
+    data = DataLoader(fallback_dir).load_csv(symbol)
+    assert list(data.columns) == ["Open", "High", "Low", "Close", "Volume"]
+    assert len(data) == 15
+    assert data.index.is_monotonic_increasing
+
+
+@pytest.mark.parametrize("symbol", ["ZN=F", "ES=F"])
+def test_new_asset_api_failure_falls_back_to_csv(
+    symbol: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fallback_dir = Path(__file__).resolve().parents[1] / "data" / "sample_csv"
+    loader = DataLoader(fallback_dir)
+
+    class FakeYahoo:
+        @staticmethod
+        def download(*args, **kwargs):
+            raise RuntimeError("rate limited")
+
+    import backtester.data_loader as data_loader_module
+
+    monkeypatch.setattr(data_loader_module, "yf", FakeYahoo)
+    data = loader.load(symbol)
+    assert len(data) == 15
+    assert data.index.is_monotonic_increasing
+
+
 def test_missing_fallback_raises(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="No market data"):
         DataLoader(tmp_path).load_csv("MISSING")
