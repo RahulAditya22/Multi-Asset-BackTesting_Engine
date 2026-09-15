@@ -30,13 +30,17 @@ def test_load_csv_parses_ohlcv(tmp_path: Path) -> None:
 
 def test_api_failure_falls_back_to_csv(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     sample_csv(tmp_path)
+    loader = DataLoader(tmp_path)
+
     class FakeYahoo:
         @staticmethod
         def download(*args, **kwargs):
             raise RuntimeError("rate limited")
+
     import backtester.data_loader as data_loader_module
+
     monkeypatch.setattr(data_loader_module, "yf", FakeYahoo)
-    assert len(DataLoader(tmp_path).load("TEST")) == 3
+    assert len(loader.load("TEST")) == 3
 
 
 def test_missing_fallback_raises(tmp_path: Path) -> None:
