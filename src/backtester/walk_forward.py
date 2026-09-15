@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from .engine import BacktestResult, Backtester
+from .engine import Backtester, BacktestResult
 from .performance import PerformanceAnalyzer
 from .strategies.base import Strategy
 
